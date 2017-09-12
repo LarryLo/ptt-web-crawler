@@ -1,0 +1,16 @@
+version: '3'
+services: 
+  ptt-crawler:        
+    build: 
+      context: .
+      dockerfile: Dockerfile        
+    container_name: ptt-crawler          
+    volumes:
+      - ~/Documents/Projects/GitHub/ptt-crawler:/opt/ptt-crawler  
+
+  elasticsearch:
+    image: elasticsearch
+    ports:
+      - 9200:9200
+      - 9300:9300        
+
