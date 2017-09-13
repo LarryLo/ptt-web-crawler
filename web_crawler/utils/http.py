@@ -29,8 +29,11 @@ class PttWrapper:
                 index), 
             method='GET',
             headers=self.headers)
-        with urllib.request.urlopen(req) as rsp:
+        try:
+            rsp = urllib.request.urlopen(req) 
             return rsp.read()
+        except:
+            return ''
 
     def get_article(self, board, article_id):    
         req = Request(
@@ -41,6 +44,9 @@ class PttWrapper:
                 article_id), 
             method='GET',
             headers=self.headers)
-        with urllib.request.urlopen(req) as rsp:
+        try:
+            rsp = urllib.request.urlopen(req) 
             return rsp.read()
+        except:
+            return ''
         

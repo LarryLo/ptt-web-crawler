@@ -64,13 +64,31 @@ class ElasticsearchWrapper:
                         'type': 'keyword',
                         },    
                     'like': {
-                        'type': 'integer',
+                        'type': 'nested',
+                        'properties': {
+                            'user_id': 'keyword',
+                            'tag': 'keyword',
+                            'content': 'keyword',
+                            'datetime': 'keyword',
+                            }
                         },    
                     'dislike': {
-                        'type': 'integer',
+                        'type': 'nested',
+                        'properties': {
+                            'user_id': 'keyword',
+                            'tag': 'keyword',
+                            'content': 'keyword',
+                            'datetime': 'keyword',
+                            }
                         },    
                     'arrow': {
-                        'type': 'integer',
+                        'type': 'nested',
+                        'properties': {
+                            'user_id': 'keyword',
+                            'tag': 'keyword',
+                            'content': 'keyword',
+                            'datetime': 'keyword',
+                            }
                         },    
                     }    
                 }
@@ -95,9 +113,9 @@ class ElasticsearchWrapper:
                     'created_datetime': article.created_datetime,
                     'ip': article.ip,
                     'article_url': article.article_url,
-                    'like': article.like,
-                    'dislike': article.dislike,
-                    'arrow': article.arrow
+                    'like': [ like.__dict__ for like in article.like ],
+                    'dislike': [ dislike.__dict__ for dislike in article.dislike ],
+                    'arrow': [ arrow.__dict__ for arrow in article.arrow ]
                 }
             }
             for article in articles

@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 import configparser
 import re
+import time
 from base.article import PttArticle
-from bs4 import BeautifulSoup
+from base.comment import PttComment
+from pyquery import PyQuery as pq
 
 config = configparser.ConfigParser()
 config.read('etc/config.ini')
-
 
 class PttHtmlParser:
     '''
@@ -14,74 +15,78 @@ class PttHtmlParser:
     '''
     @staticmethod
     def count_article_list(board, html):
-        soup = BeautifulSoup(html, 'html.parser')
-        # parse each field
-        paging = soup.find_all('a', class_='wide')
-        last_sec_page = paging[1]['href']
-        article_page_count = int(re.search(r'\d+', last_sec_page).group(0)) + 1
+        a = pq(html)('a').filter('.wide')[1].attrib['href']
+        article_page_count = int(re.search(r'\d+', a).group(0)) + 1
         return article_page_count
 
     @staticmethod
     def parse_article_list(board, html):
-        soup = BeautifulSoup(html, 'html.parser')
-        # parse each field
-        title = soup.find_all('div', class_='title')
-
+        title_list = pq(html)('div .title')
         article_id_list = []
-        for idx in range(len(title)):
-            article_id_list.append(re.search(r'M.\d+.\d\S+',title[idx].a['href']).group(0)[:-5])
+        for title in title_list:
+            article_id_list.append(re.search(r'M.\d+.\d\S+', title.find('a').attrib['href']).group(0)[:-5])
         return article_id_list
 
 
     @staticmethod
     def parse_article(article_id, html):
-        soup = BeautifulSoup(html, 'html.parser')
-        # parse each field
-        main_content = soup.find_all('span')
+        full_content = pq(html)('#main-content')
+        ## metadata
+        meta_values = full_content.find('.article-meta-value')
         # board
-        board = main_content[6].string
+        board = '' if len(meta_values) != 4 else meta_values[1].text
         # author
-        author = main_content[4].string
+        author = '' if len(meta_values) != 4 else meta_values[0].text
         # title
-        title = soup.find('meta', property='og:title')
-        title = '' if title is None else title['content']
-        # content
-        meta = soup.find_all('div', class_='article-metaline')
-        content = ''
-        for sibling in meta[2].next_siblings:
-            if sibling.string is not None:
-                content += sibling.string
-        # ptt        
-        site_name = soup.find('meta', property='og:site_name')
-        site_name = '' if site_name is None else site_name['content']
+        title = '' if len(meta_values) != 4 else meta_values[2].text
         # datetime
-        created_datetime = main_content[10].string
-        
-        # ip
-        ip_pattern1 = soup.find_all(string=re.compile('批踢踢實業坊\(ptt.cc\), 來自: '))
+        created_datetime = '' if len(meta_values) != 4 else meta_values[3].text
+        ## comments 
+        # like
+        # dislike
+        # arrow
+        like = []
+        dislike = []
+        arrow = []
+        comments = full_content.find('.push')
+        for comment in comments:
+            user_id = pq(comment).find('.push-userid').text()
+            push = pq(comment).find('.push-tag').text()
+            content = pq(comment).find('.push-content').text()
+            ipdatetime = pq(comment).find('.push-ipdatetime').text()
+            ptt_comment = PttComment(user_id, push, content, ipdatetime)
 
+            if push == '推':
+               like.append(ptt_comment) 
+            elif push == '噓':    
+               dislike.append(ptt_comment) 
+            elif push == '→':  
+               arrow.append(ptt_comment) 
+
+        ## main content
+        # content
+        content = full_content.remove('.push').remove('.article-metaline').remove('article-metaline-right').text()
+        ## ptt        
+        site_name = pq(html)('#logo').text()
+        ## ip
+        f2_text = full_content.find('span.f2').text()
+        ip_pattern1 = r'來自: \d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}'
+        ip_pattern2 = r'From: \d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}'
+        ip_re = re.search(ip_pattern1, f2_text)
         ip = ''
-        if len(ip_pattern1) != 0:
-            ip = re.search(r'\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}', ip_pattern1[0])
-            ip = ip.group(0) 
-        elif len(ip_pattern1) == 0:    
-            ip_pattern2 = soup.find_all(string=re.compile('編輯:\s\w+ \(\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}\)'))
-            if len(ip_pattern2) != 0:
-              ip = re.search(r'\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}', ip_pattern2[0])
-              ip = ip.group(0) 
+        if ip_re is None:
+            ip_re = re.search(ip_pattern2, content)
+            if ip_re is not None:
+                ip = ip_re.group(0)[5:] 
+        else:
+            ip = ip_re.group(0)[3:]
 
-        # article_url 
+        ## article_url 
         article_url = '{0}://{1}/{2}/{3}.html'.format(
                     config['ptt']['ptt.protocol'],
                     config['ptt']['ptt.url.prefix'],
                     board,
                     article_id)
-        # like
-        like = len(soup.find_all('span', class_='push-tag', string=re.compile('推')))
-        # dislike
-        dislike = len(soup.find_all('span', class_='push-tag', string=re.compile('噓')))
-        # arrow
-        arrow = len(soup.find_all('span', class_='push-tag', string=re.compile('→')))
 
         article = PttArticle(
                 board, 

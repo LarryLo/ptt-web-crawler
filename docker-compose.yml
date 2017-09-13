@@ -1,5 +1,11 @@
 version: '3'
 services: 
+  elasticsearch:
+    image: elasticsearch
+    ports:
+      - 9200:9200
+      - 9300:9300        
+
   ptt-crawler:        
     build: 
       context: .
@@ -7,10 +13,5 @@ services:
     container_name: ptt-crawler          
     volumes:
       - ~/Documents/Projects/GitHub/ptt-crawler:/opt/ptt-crawler  
-
-  elasticsearch:
-    image: elasticsearch
-    ports:
-      - 9200:9200
-      - 9300:9300        
+    tty: true    
 
