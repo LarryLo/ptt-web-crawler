@@ -16,4 +16,4 @@ RUN \
   apt-get clean && rm -rf /var/lib/apt/lists/* 
 
 WORKDIR /opt/ptt-crawler
-ENTRYPOINT /bin/bash
+ENTRYPOINT python web_crawler/ptt.py
