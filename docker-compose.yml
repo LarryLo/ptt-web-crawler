@@ -12,6 +12,6 @@ services:
       dockerfile: Dockerfile        
     container_name: ptt-crawler          
     volumes:
-      - ~/Documents/Projects/GitHub/ptt-crawler:/opt/ptt-crawler  
+      - /tmp:/opt/ptt-crawler/tmp      
     tty: true    
 

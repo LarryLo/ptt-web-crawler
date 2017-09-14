@@ -1,0 +1,11 @@
+sudo: required
+
+services:
+  - docker
+
+before_install:
+  - docker build -t ptt-crawler:1.0 .
+  - docker run -d -p 9200:9200 -p 9300:9300 elasticsearch  
+    
+script:
+  - docker run -dt -v /tmp:/opt/ptt-crawler/tmp --rm --name ptt-crawler --network host ptt-crawler:1.0    
