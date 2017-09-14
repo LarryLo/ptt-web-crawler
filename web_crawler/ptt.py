@@ -4,6 +4,7 @@ import time
 from utils.http import PttWrapper
 from utils.elasticsearch import ElasticsearchWrapper
 from utils.parser import PttHtmlParser
+from utils.file import FileWrapper 
 
 config = configparser.ConfigParser()
 config.read('etc/config.ini')
@@ -29,9 +30,13 @@ def main():
             for article_id in article_id_list:
                 # Get each article html by article_id
                 article_html = ptt_wrapper.get_article(board, article_id)
+                article_html = str(article_html, 'utf-8')
                 if article_html:
                     article = PttHtmlParser.parse_article(article_id, article_html)
                     articles.append(article)
+                # Store article to tmp folder
+                FileWrapper.store(board, article_id, article_html)    
+                    
             print('---{0}/{1}: {2} seconds---'.format(idx, article_page_count, time.time() - start_time))
 
             if idx == article_page_count:

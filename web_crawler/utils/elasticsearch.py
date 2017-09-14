@@ -19,7 +19,6 @@ class ElasticsearchWrapper:
 
     def __init__(self):
         self.index_article = 'ptt_article'
-        self.index_comment = 'ptt_comment'
         if 'elasticsearch' not in config:
             print('Not found [elasticsearch] section in settins, we\'ll use localhost:9200 as default.')
             self.conn = Elasticsearch()
@@ -29,7 +28,6 @@ class ElasticsearchWrapper:
             else:
                 self.conn = Elasticsearch()
         self.conn.indices.create(index=self.index_article, ignore=400, body=self.get_article_mapping())
-        self.conn.indices.create(index=self.index_comment, ignore=400)
 
     def get_article_mapping(self):
         mapping = {

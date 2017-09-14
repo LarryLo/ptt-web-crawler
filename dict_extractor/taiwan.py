@@ -8,17 +8,17 @@ stopword_pattern = r'，'
 english_pattern = r'\('
 mydict_filename = 'mydict.dic'
 
-if not os.path.exists(os.path.dirname('files/{0}'.format(mydict_filename))):
+if not os.path.exists(os.path.dirname('assets/dictionary/{0}'.format(mydict_filename))):
     try:
-        os.makedirs(os.path.dirname('files/{0}'.format(mydict_filename)))
+        os.makedirs(os.path.dirname('assets/dictionary/{0}'.format(mydict_filename)))
     except:
         raise
 
-with open('files/dict-revised.json') as s:
+with open('assets/dictionary/dict-revised.json') as s:
     read_data = s.read()
     s.close()
     dict_json = json.loads(read_data)
-    with open('files/{0}'.format(mydict_filename), 'a') as d:
+    with open('assets/dictionary/{0}'.format(mydict_filename), 'a') as d:
         for word in dict_json:
             my_word = word['title']
 
