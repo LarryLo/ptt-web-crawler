@@ -7,15 +7,15 @@ from utils.elasticsearch import ElasticsearchWrapper
 from utils.parser import PttHtmlParser
 from utils.file import FileWrapper 
 
+config = configparser.ConfigParser()
+config.read('etc/config.ini')
+
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S',
-                    filename='/tmp/ptt-crawler.log',
+                    filename=config['log']['log.file'],
                     filemode='w')
 logger = logging.getLogger(__file__)
-
-config = configparser.ConfigParser()
-config.read('etc/config.ini')
 
 def main():
     ptt_wrapper = PttWrapper()
@@ -50,7 +50,7 @@ def main():
             if idx == article_page_count:
                 # Index latest page
                 es.bulk_index_article(articles)
-            elif idx % 20 == 0:
+            elif idx % int(config['elasticsearch']['es.index.period']) == 0:
                 start_time = time.time()
                 es.bulk_index_article(articles)
                 logger.info('Index {0}/{1}: {2} seconds'.format(idx, article_page_count, time.time() - start_time))
