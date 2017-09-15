@@ -7,7 +7,7 @@ from utils.elasticsearch import ElasticsearchWrapper
 from utils.parser import PttHtmlParser
 from utils.file import FileWrapper 
 
-logging.basicConfig(level=logging.DEBUG,
+logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S',
                     filename='/tmp/ptt-crawler.log',
