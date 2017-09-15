@@ -1,10 +1,18 @@
 # -*- coding: utf-8 -*-
 import configparser
 import time
+import logging
 from utils.http import PttWrapper
 from utils.elasticsearch import ElasticsearchWrapper
 from utils.parser import PttHtmlParser
 from utils.file import FileWrapper 
+
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S',
+                    filename='/tmp/ptt-crawler.log',
+                    filemode='w')
+logger = logging.getLogger(__file__)
 
 config = configparser.ConfigParser()
 config.read('etc/config.ini')
@@ -37,7 +45,7 @@ def main():
                 # Store article to tmp folder
                 FileWrapper.store(board, article_id, article_html)    
                     
-            print('---{0}/{1}: {2} seconds---'.format(idx, article_page_count, time.time() - start_time))
+            logger.info('Round {0}/{1}: {2} seconds'.format(idx, article_page_count, time.time() - start_time))
 
             if idx == article_page_count:
                 # Index latest page
@@ -45,7 +53,7 @@ def main():
             elif idx % 20 == 0:
                 start_time = time.time()
                 es.bulk_index_article(articles)
-                print('---Index {0}/{1} documents: {2} seconds---'.format(idx, article_page_count, time.time() - start_time))
+                logger.info('Index {0}/{1}: {2} seconds'.format(idx, article_page_count, time.time() - start_time))
                 del articles[:]
 
 if __name__ == '__main__':

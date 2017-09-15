@@ -1,17 +1,21 @@
 version: '3'
 services: 
-  elasticsearch:
-    image: elasticsearch
-    ports:
-      - 9200:9200
-      - 9300:9300        
-
   ptt-crawler:        
     build: 
       context: .
       dockerfile: Dockerfile        
     container_name: ptt-crawler          
+    network_mode: "host"        
     volumes:
+      - $PWD:/opt/ptt-crawler
       - /tmp:/opt/ptt-crawler/tmp      
     tty: true    
+    depends_on:
+      - elasticsearch        
+
+  elasticsearch:
+    image: elasticsearch
+    ports:
+      - 9200:9200
+      - 9300:9300        
 
