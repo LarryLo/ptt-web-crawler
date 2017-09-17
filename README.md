@@ -3,21 +3,41 @@
 # ptt-web-crawler
 This is a simple web crawler to gather data from PTT.
 
-## Configuration
+## Preprocess
+
+### Create a Google Cloud Platform account
+Our crawler will upload a backup file to gcp storage, if you don't want to use it, you can add comment file related to utils/gcp.py.
+ 
+### Configuration
 ```
-# /etc/config.ini
-# You can modify some main settings in /etc/config.ini files
+# There is a config.ini.sample under etc/
+# You have to first copy a config.ini from config.ini.sample or you can not run this project.
+$ cd <PROJECT_PATH>
+$ cp etc/config.ini.sample etc/config.ini
 ```
+
+### Assign an Elasticsearch node
+Our crawler will index ptt article as a document indicing into Elasticsearch, if you don't want to use it, you can add comment file related to utils/elasticsearch.py
 
 ## How to use it?
 
+### (Optional) Run an Elasticsearch local node
+```
+$ docker run -d --network host --name es_local elasticsearch 
+```
+
+### Download Service Crediential from GCP
+If you want to use GCP storage service, you need to download GCP storage crediential (a json file) and rename to <b>oauth.json<b> located to <PROJECT_PATH>
+
 ### Build a docker image
 ```
+$ cd <PROJECT_PATH>
 $ docker build -t ptt-crawler:latest .
 ```
 
 ### Run and mount host's directory to store log and data
 ```
+$ cd <PROJECT_PATH>
 $ docker run -d -v /tmp:/tmp -v $PWD:/opt/ptt-crawler --name ptt-crawler --network host ptt-crawler:latest
 ```
 

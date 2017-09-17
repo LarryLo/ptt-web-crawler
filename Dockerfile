@@ -1,5 +1,6 @@
 FROM python:3
 
+ENV GOOGLE_APPLICATION_CREDENTIALS /opt/ptt-crawler/oauth.json
 RUN \
   apt-get update && apt-get install -y \
     lsb-release && \

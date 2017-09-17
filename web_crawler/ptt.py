@@ -6,6 +6,7 @@ from utils.http import PttWrapper
 from utils.elasticsearch import ElasticsearchWrapper
 from utils.parser import PttHtmlParser
 from utils.file import FileWrapper 
+from utils.gcp import GCPWrapper
 
 config = configparser.ConfigParser()
 config.read('etc/config.ini')
@@ -20,6 +21,7 @@ logger = logging.getLogger(__file__)
 def main():
     ptt_wrapper = PttWrapper()
     es = ElasticsearchWrapper()
+    gcp = GCPWrapper()
 
     for board in eval(config['ptt']['ptt.board.list']):
         # Get article list by board index page
@@ -42,8 +44,11 @@ def main():
                 if article_html:
                     article = PttHtmlParser.parse_article(article_id, article_html)
                     articles.append(article)
-                # Store article to tmp folder
-                FileWrapper.store(board, article_id, article_html)    
+                    # Store article to tmp folder
+                    FileWrapper.store(board, article_id, article_html)    
+                    ## Upload file to gcp storage
+                    # Not thread safe
+                    gcp.upload(board, article_id)
                     
             logger.info('Round {0}/{1}: {2} seconds'.format(idx, article_page_count, time.time() - start_time))
 
