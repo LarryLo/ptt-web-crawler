@@ -1,5 +1,5 @@
 [elasticsearch]
-es.url = ['192.168.10.202:9200','192.168.10.185:9200']
+es.url = ['localhost:9200']
 # There are at most 20 articles in one article list.
 # If you set the parameter as 1, it means you index 20 articles as 1 bulk to elasticsearch.
 es.index.period = 10
