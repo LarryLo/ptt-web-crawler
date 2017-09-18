@@ -27,7 +27,7 @@ $ docker run -d --network host --name es_local elasticsearch
 ```
 
 ### Download Service Crediential from GCP
-If you want to use GCP storage service, you need to download GCP storage crediential (a json file) and rename to <b>oauth.json<b> located to <PROJECT_PATH>
+If you want to use GCP storage service, you need to download GCP storage crediential (a json file) and rename to <b>oauth.json</b> located to <PROJECT_PATH>
 
 ### Build a docker image
 ```
