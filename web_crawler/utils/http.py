@@ -1,10 +1,17 @@
 # -*- coding: utf-8 -*-
+import logging
 import configparser
-import urllib.request
-from urllib.request import Request
+import urllib3
 
 config = configparser.ConfigParser()
 config.read('etc/config.ini')
+
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S',
+                    filename=config['log']['log.file'],
+                    filemode='w')
+logger = logging.getLogger(__file__)
 
 class PttWrapper:
     """
@@ -21,32 +28,34 @@ class PttWrapper:
         # oldest index: 1
         # newest index: '' (blank)
     def get_article_list(self, board, index):
-        req = Request(
-            "{0}://{1}/{2}/index{3}.html".format(
-                self.protocol, 
-                self.url_prefix, 
-                board, 
-                index), 
-            method='GET',
-            headers=self.headers)
+        http = urllib3.PoolManager()
         try:
-            rsp = urllib.request.urlopen(req) 
-            return rsp.read()
-        except:
+            req = http.request(
+                    'GET',
+                    '{0}://{1}/{2}/index{3}.html'.format(
+                        self.protocol, 
+                        self.url_prefix, 
+                        board, 
+                        index), 
+                    headers=self.headers)
+            return req.data
+        except Exception as e:    
+            logger.error(str(e))
             return ''
 
     def get_article(self, board, article_id):    
-        req = Request(
-            "{0}://{1}/{2}/{3}.html".format(
-                self.protocol, 
-                self.url_prefix, 
-                board, 
-                article_id), 
-            method='GET',
-            headers=self.headers)
+        http = urllib3.PoolManager()
         try:
-            rsp = urllib.request.urlopen(req) 
-            return rsp.read()
-        except:
+            req = http.request(
+                    'GET',
+                    '{0}://{1}/{2}/{3}.html'.format(
+                        self.protocol, 
+                        self.url_prefix, 
+                        board, 
+                        article_id), 
+                    headers=self.headers)
+            return req.data
+        except Exception as e:    
+            logger.error(str(e))
             return ''
-        
+

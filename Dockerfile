@@ -11,6 +11,7 @@ RUN \
     google-cloud-sdk \
     openssl && \
   pip install \
+    urllib3 \
     google-cloud-storage \
     pyquery \
     elasticsearch && \
