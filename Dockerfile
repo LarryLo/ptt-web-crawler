@@ -10,7 +10,7 @@ RUN \
   apt-get update && apt-get install -y \
     google-cloud-sdk \
     openssl && \
-  pip install \
+  pip install --no-cache-dir \
     urllib3 \
     google-cloud-storage \
     pyquery \
