@@ -28,15 +28,18 @@ with open('assets/dictionary/dict-revised.json') as s:
                 if re.search(english_pattern, my_word) is not None:
                     en_idx = my_word.index('(') 
                     my_word = my_word[:en_idx]
-                    d.write('{0}\n'.format(my_word))
+                    if len(my_word) > 1:
+                        d.write('{0}\n'.format(my_word)) 
                     continue
 
                 # with stopword
                 if re.search(stopword_pattern, my_word) is not None:
                     word_arr = my_word.split(stopword_pattern)
                     for word in word_arr:
-                        d.write('{0}\n'.format(word))
+                        if len(my_word) > 1:
+                            d.write('{0}\n'.format(word))
                     continue    
 
-                d.write('{0}\n'.format(my_word))
+                if len(my_word) > 1:
+                    d.write('{0}\n'.format(my_word))
 
