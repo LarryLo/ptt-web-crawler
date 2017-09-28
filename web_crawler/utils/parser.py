@@ -2,12 +2,20 @@
 import configparser
 import re
 import time
+import logging
 from base.article import PttArticle
 from base.comment import PttComment
 from pyquery import PyQuery as pq
 
 config = configparser.ConfigParser()
 config.read('etc/config.ini')
+
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S',
+                    filename=config['log']['log.file'],
+                    filemode='w')
+logger = logging.getLogger(__file__)
 
 class PttHtmlParser:
     '''
@@ -24,9 +32,14 @@ class PttHtmlParser:
         title_list = pq(html)('div .title')
         article_id_list = []
         for title in title_list:
-            article_id_list.append(re.search(r'M.\d+.\d\S+', title.find('a').attrib['href']).group(0)[:-5])
-        return article_id_list
+            try:
+                url = re.search(r'M.\d+.\d\S+', title.find('a').attrib['href'])
+                article_id_list.append(url.group(0)[:-5])
+            except Exception as e:
+                logger.info('No [{0}] article url.'.format(title))
+                logger.error(str(e))
 
+        return article_id_list
 
     @staticmethod
     def parse_article(article_id, html):
