@@ -29,6 +29,10 @@ class ElasticsearchWrapper:
                 self.conn = Elasticsearch()
         self.conn.indices.create(index=self.index_article, ignore=400, body=self.get_article_mapping())
 
+    @staticmethod
+    def put_template_settings():
+        return ''
+
     def get_article_mapping(self):
         mapping = {
         'mappings': {
